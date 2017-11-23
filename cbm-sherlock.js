@@ -1,20 +1,19 @@
 'use strict';
 
 const CallByMeaning = require('cbm-api');
-const cbm = new CallByMeaning();
+const cbm = new CallByMeaning('http://localhost:3000');
 
 (async function main() {
   //  *0. Read the file
-  const readFile = eval((await cbm.call(['file', 'mode'], ['file', 'read'], 'file', 'file', true)).body);
+  const readFile = eval((await cbm.call(['file', 'mode'], [null, 'read'], 'file', null, true)).body);
   const sherlockFile = readFile('./lib/sherlock.txt');
 
   //  *1. Create an array containing every word
-  const tokenize = eval((await cbm.call('string', 'string', 'array', 'token', true)).body);
-  let sherlock = tokenize(sherlockFile);
+  let sherlock = (await cbm.call('string', null, [sherlockFile], 'array', 'token')).body;
 
   //  *2. Remove unnecessary words
   //    *a. Join concecutive words that start with Uppercase i.e ['Sherlock', 'Holmes'] -> ['Sherlock Holmes']
-  const capitalize = eval((await cbm.call('string', 'string', 'string', 'capitalized', true)).body);
+  const capitalize = eval((await cbm.call('string', null, 'string', 'capitalized', true)).body);
   const punctuation = new RegExp(/^['!"#$%&\\'()*+,\-./:;<=>?@[\\\]^_`{|}~']/);
   for (let i = 0; i < sherlock.length; i++) {
     if (sherlock[i] === capitalize(sherlock[i]) && !punctuation.test(sherlock[i])) {
@@ -45,8 +44,8 @@ const cbm = new CallByMeaning();
   sherlock = sherlock.filter((word) => word !== word.toUpperCase());
 
   //  *5. Remove dublicates
-  //    a. Things that appear more than once
-  sherlock = (await cbm.call('array', 'array', [sherlock], 'array', 'unique')).body;
+  //    *a. Things that appear more than once
+  sherlock = (await cbm.call('array', null, [sherlock], 'array', 'unique')).body;
 
   //    b. Things that are the "same" i.e 'Holmes', 'Sherlock', 'Sherlock Holmes'
   sherlock = sherlock.filter((w, i, a) => {
@@ -56,12 +55,12 @@ const cbm = new CallByMeaning();
     return true;
   });
 
-  //  6. Write them to a file
-  try {
-    const writeFile = eval((await cbm.call(['file', 'mode'], ['file', 'write'], ['file'], ['file'], true)).body);
+  //  *6. Sort the results
+  sherlock = eval((await cbm.call(['array', 'function'], null, [sherlock], 'array', 'sorted')).body);
+
+  //  *7. Write them to a file
+    const writeFile = eval((await cbm.call(['file', 'mode'], [null, 'write'], 'file', null, true)).body);
     writeFile(sherlock, __dirname.concat('/results/cbm.txt'));
+
     return 'Done!';
-  } catch (error) {
-    return console.error(error);
-  }
-})().then((v) => console.log(v));
+})().then((v) => console.log(v)).catch((e) => console.error(e));

@@ -54,7 +54,10 @@ function main() {
     return true;
   });
 
-  //  6. Write them to a file
+  //  6. Sort the results
+  sherlock = sherlock.sort();
+
+  //  7. Write them to a file
   try {
     fs.writeFileSync(__dirname.concat('/results/pure.txt'), sherlock, ['utf8', 0o666, 'w+']);
     return 'Done!';
