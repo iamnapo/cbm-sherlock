@@ -1,7 +1,7 @@
 'use strict';
 
 const CallByMeaning = require('cbm-api');
-const cbm = new CallByMeaning('http://localhost:3000');
+const cbm = new CallByMeaning();
 
 (async function main() {
   //  *0. Read the file
@@ -12,7 +12,7 @@ const cbm = new CallByMeaning('http://localhost:3000');
   let sherlock = (await cbm.call('string', null, [sherlockFile], 'array', 'token')).body;
 
   //  *2. Remove unnecessary words
-  //    *a. Join concecutive words that start with Uppercase i.e ['Sherlock', 'Holmes'] -> ['Sherlock Holmes']
+  //    ~*a. Join concecutive words that start with Uppercase i.e ['Sherlock', 'Holmes'] -> ['Sherlock Holmes']
   const capitalize = eval((await cbm.call('string', null, 'string', 'capitalized', true)).body);
   const punctuation = new RegExp(/^['!"#$%&\\'()*+,\-./:;<=>?@[\\\]^_`{|}~']/);
   for (let i = 0; i < sherlock.length; i++) {
@@ -27,7 +27,7 @@ const cbm = new CallByMeaning('http://localhost:3000');
       }
     }
   }
-  //    *b. Remove words that don't start with an uppercase letter but keep periods
+  //    ~*b. Remove words that don't start with an uppercase letter but keep periods
   sherlock = sherlock.filter((word) => (word === capitalize(word) || punctuation.test(word)) && word !== 'I'); // I is a special case
 
   //  3. Remove words that are after a punctuation point (and also the point itself)
@@ -42,7 +42,6 @@ const cbm = new CallByMeaning('http://localhost:3000');
 
   //  4. Remove words that are in ALL CAPS
   sherlock = sherlock.filter((word) => word !== word.toUpperCase());
-
   //  *5. Remove dublicates
   //    *a. Things that appear more than once
   sherlock = (await cbm.call('array', null, [sherlock], 'array', 'unique')).body;
@@ -56,7 +55,10 @@ const cbm = new CallByMeaning('http://localhost:3000');
   });
 
   //  *6. Sort the results
-  sherlock = eval((await cbm.call(['array', 'function'], null, [sherlock], 'array', 'sorted')).body);
+  sherlock = (await cbm.call(['array', 'function'], null, [sherlock], 'array', 'sorted')).body;
+
+  // *BONUS. Remove Irene Adler because I don't like her
+  sherlock = (await cbm.call(['array', 'values', 'boolean_operator'], [null, null, 'xor'], [sherlock, 'Irene Adler'], 'array', null)).body;
 
   //  *7. Write them to a file
     const writeFile = eval((await cbm.call(['file', 'mode'], [null, 'write'], 'file', null, true)).body);
