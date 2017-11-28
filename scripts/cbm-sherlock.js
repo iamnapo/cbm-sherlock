@@ -3,7 +3,7 @@
 const CallByMeaning = require('cbm-api');
 const cbm = new CallByMeaning();
 
-(async function main() {
+async function main() {
   //  *0. Read the file
   const readFile = eval((await cbm.call(['file', 'mode'], [null, 'read'], 'file', null, true)).body);
   const sherlockFile = readFile('./lib/sherlock.txt');
@@ -62,7 +62,9 @@ const cbm = new CallByMeaning();
 
   //  *7. Write them to a file
     const writeFile = eval((await cbm.call(['file', 'mode'], [null, 'write'], 'file', null, true)).body);
-    writeFile(sherlock, __dirname.concat('/results/cbm.txt'));
+    writeFile(sherlock, __dirname.concat('/../results/cbm.txt'));
 
     return 'Done!';
-})().then((v) => console.log(v)).catch((e) => console.error(e));
+}
+
+module.exports = main;
