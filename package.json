@@ -21,7 +21,7 @@
   "homepage": "https://github.com/iamnapo/cbm-sherlock#readme",
   "private": true,
   "dependencies": {
-    "cbm-api": "github:iamnapo/cbm-api",        
+    "cbm-api": "github:iamnapo/cbm-api",
     "natural": "^0.5.4"
   }
 }

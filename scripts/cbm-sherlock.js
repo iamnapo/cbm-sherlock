@@ -1,6 +1,7 @@
-'use strict';
+/* eslint-disable no-eval */
 
 const CallByMeaning = require('cbm-api');
+
 const cbm = new CallByMeaning();
 
 async function main() {
@@ -15,7 +16,7 @@ async function main() {
   //    ~*a. Join concecutive words that start with Uppercase i.e ['Sherlock', 'Holmes'] -> ['Sherlock Holmes']
   const capitalize = eval((await cbm.call('string', null, 'string', 'capitalized', true)).body);
   const punctuation = new RegExp(/^['!"#$%&\\'()*+,\-./:;<=>?@[\\\]^_`{|}~']/);
-  for (let i = 0; i < sherlock.length; i++) {
+  for (let i = 0; i < sherlock.length; i += 1) {
     if (sherlock[i] === capitalize(sherlock[i]) && !punctuation.test(sherlock[i])) {
       if (sherlock[i + 1] === capitalize(sherlock[i + 1]) && !punctuation.test(sherlock[i + 1])) {
         sherlock[i] += ' '.concat(sherlock[i + 1]);
@@ -28,29 +29,27 @@ async function main() {
     }
   }
   //    ~*b. Remove words that don't start with an uppercase letter but keep periods
-  sherlock = sherlock.filter((word) => (word === capitalize(word) || punctuation.test(word)) && word !== 'I'); // I is a special case
+  sherlock = sherlock.filter(word => (word === capitalize(word) || punctuation.test(word)) && word !== 'I'); // I is a special case
 
   //  3. Remove words that are after a punctuation point (and also the point itself)
-  let temp = [];
+  const temp = [];
 
-  for (let i = 0; i < sherlock.length; i++) {
-    if (punctuation.test(sherlock[i])) continue;
-    if (punctuation.test(sherlock[i - 1])) continue;
-    temp.push(sherlock[i]);
+  for (let i = 0; i < sherlock.length; i += 1) {
+    if (!punctuation.test(sherlock[i]) && !punctuation.test(sherlock[i - 1])) temp.push(sherlock[i]);
   }
   sherlock = temp;
 
   //  4. Remove words that are in ALL CAPS
-  sherlock = sherlock.filter((word) => word !== word.toUpperCase());
+  sherlock = sherlock.filter(word => word !== word.toUpperCase());
   //  *5. Remove dublicates
   //    *a. Things that appear more than once
   sherlock = (await cbm.call('array', null, [sherlock], 'array', 'unique')).body;
 
   //    b. Things that are the "same" i.e 'Holmes', 'Sherlock', 'Sherlock Holmes'
   sherlock = sherlock.filter((w, i, a) => {
-    for (let word of a) {
+    a.forEach((word) => {
       if (word.indexOf(w) > -1 && word !== w) return word.length < w.length;
-    }
+    });
     return true;
   });
 
@@ -61,10 +60,10 @@ async function main() {
   sherlock = (await cbm.call(['array', 'values', 'boolean_operator'], [null, null, 'xor'], [sherlock, 'Irene Adler'], 'array', null)).body;
 
   //  *7. Write them to a file
-    const writeFile = eval((await cbm.call(['file', 'mode'], [null, 'write'], 'file', null, true)).body);
-    writeFile(sherlock, __dirname.concat('/../results/cbm.txt'));
+  const writeFile = eval((await cbm.call(['file', 'mode'], [null, 'write'], 'file', null, true)).body);
+  writeFile(sherlock, __dirname.concat('/../results/cbm.txt'));
 
-    return 'Done!';
+  return 'Done!';
 }
 
 module.exports = main;
