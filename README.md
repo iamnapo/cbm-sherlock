@@ -1,3 +1,5 @@
+# __ARCHIVED__. Check [cbmjs/cbm-sherlock](https://github.com/cbmjs/cbm-sherlock)
+
 # cbm-sherlock
 
 A small script that uses the CallByMeaning project to deduce(🕵🏼) the number of characters that appear in the book The Adventures of Sherlock Holmes: A scandal in Bohemia.
